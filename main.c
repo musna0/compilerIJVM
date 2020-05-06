@@ -19,15 +19,17 @@ typedef struct{
 Var v[DIM];
 int curr = 0;
 Var con[DIM];
+char nomeFile[DIM];
 
-FILE * openFile(char*);
+FILE * openFile();
 void closeFile(FILE *);
-bool checkExist(char*);
+bool checkExist();
 void identifyInstruction(const char*, FILE *);
 void strtoint(const char*, char *);
 void simulation(int mode, char*, FILE *);
 int identifyLabl(char*, FILE *);
 void identifyVar(FILE *);
+void assignName();
 
 int main() {
     FILE * fp = NULL;
@@ -44,14 +46,14 @@ int main() {
     return 0;
 }
 
-FILE * openFile(char* fName){
+FILE * openFile(){
     FILE * fp = NULL;
 
-    if(checkExist(fName)){
-        fp = fopen(fName, "r");
+    if(checkExist(nomeFile)){
+        fp = fopen(nomeFile, "r");
         if(fp == NULL) exit(-1);
     }else{
-        fp = fopen(fName, "w");
+        fp = fopen(nomeFile, "w");
         if(fp == NULL) exit(-1);
     }
 
@@ -62,8 +64,8 @@ void closeFile(FILE * fp){
     fclose(fp);
 }
 
-bool checkExist(char* fName){
-    if( access( fName, F_OK ) != -1 ) return true;
+bool checkExist(){
+    if( access( nomeFile, F_OK ) != -1 ) return true;
     else return false;
 }
 
@@ -312,23 +314,8 @@ void simulation(int mode, char *search, FILE * fp){
     size_t len = 0;
 
     if(mode == 2){
-        int  condizione;
-        char nomeFile[DIM] = "%&NO_file_NAME&%";
-        printf("Inserire il nome del file da aprire, compresa l'estensione.\n"
-               "Se si vuole aprire un file in una cartella diversa da quella corrente inserire anche il percorso.");
-        do{
-            printf("\n>");
-            scanf("%[^\n]", nomeFile);
-            if(checkExist(nomeFile) == true){
-                condizione = 1;
-                fp = openFile(nomeFile);
-            } else {
-                printf("Non esiste un file chiamato %s nella directory corrente, inserire nome valido", nomeFile);
-                getchar();
-                condizione = 0;
-            }
-        }while (!condizione);
-
+        assignName();
+        fp = openFile();
     }
 
     while(getline(&line, &len, fp) != -1) {
@@ -338,7 +325,7 @@ void simulation(int mode, char *search, FILE * fp){
                 simulation(0, " ", fp);
             }
             if(res == -1){
-                printf("\nerror occurred - no label found");
+                printf("\nError occurred - no label found");
             }
         }
         else identifyInstruction(line, fp);
@@ -350,7 +337,7 @@ int identifyLabl(char *label, FILE * fp){
     size_t len = 0;
 
     closeFile(fp);
-    fp = openFile("test.txt");
+    fp = openFile();
     while(getline(&line, &len, fp) != -1) {
         if(strcmp(line, label) == 0) return 1;
     }
@@ -363,7 +350,7 @@ void identifyVar(FILE * fp){
     int start = 0, end = 0;
 
     closeFile(fp);
-    fp = openFile("test.txt");
+    fp = openFile();
     while(getline(&line, &len, fp) != -1) {
         if(strcmp(line, ".end-var\n") == 0) end = 1;
         if(start == 1 && end != 1){
@@ -379,4 +366,22 @@ void identifyVar(FILE * fp){
         }
         if(strcmp(line, ".var\n") == 0) start = 1;
     }
+}
+
+void assignName(){
+    int  condizione;
+
+    printf("Inserire il nome del file da aprire, compresa l'estensione.\n"
+           "Se si vuole aprire un file in una cartella diversa da quella corrente inserire anche il percorso.");
+    do{
+        printf("\n>");
+        scanf("%[^\n]", nomeFile);
+        if(checkExist() == true){
+            condizione = 1;
+        } else {
+            printf("Non esiste un file chiamato %s nella directory corrente, inserire nome valido", nomeFile);
+            getchar();
+            condizione = 0;
+        }
+    }while (!condizione);
 }
