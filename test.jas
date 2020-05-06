@@ -1,0 +1,21 @@
+.main
+.var
+x
+y
+z
+R
+.end-var
+
+BIPUSH 1
+BIPUSH 2
+ISUB
+ISTORE R
+ILOAD R
+IFLT test
+ERR
+
+test:
+BIPUSH 5
+OUT
+
+.end-main
