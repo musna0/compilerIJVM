@@ -1,6 +1,3 @@
-#ifndef UNTITLED5_STACK_H
-#define UNTITLED5_STACK_H
-
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -20,4 +17,4 @@ void addElement(Stack *s, int item, int max_stack_size);
 void deleteElement(Stack *s);
 void printStack(Stack s);
 
-#endif //UNTITLED5_STACK_H
+
